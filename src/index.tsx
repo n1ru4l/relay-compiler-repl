@@ -33,8 +33,8 @@ if (!root) {
   throw new Error("Could not find Application root container.");
 }
 
-const sideBarTextColor = "#9da5b4";
-const htmlBackgroundColor = "rgba(33, 37, 43, 1)";
+const sideBarTextColor = "black";
+const htmlBackgroundColor = "#f7f7f7";
 const headerHeight = "50px";
 const headerBackgroundColor = "#f26b00";
 
@@ -68,6 +68,11 @@ const globalStyles = css`
   html {
     background-color: ${htmlBackgroundColor};
   }
+
+  a {
+    text-decoration: none;
+    color: white;
+  }
 `;
 
 const AppContainer = styled.div`
@@ -84,6 +89,7 @@ const Header = styled.div`
   display: flex;
   align-items: center;
   padding: 0 16px;
+  color: white;
 `;
 
 const Heading = styled.div`
@@ -92,8 +98,15 @@ const Heading = styled.div`
   font-weight: bold;
 `;
 
+const HeaderSide = styled.div`
+  margin-left: auto;
+  margin-right: 0;
+  display: flex;
+`;
+
 const Sidebar = styled.div`
   flex: 0 0 auto;
+  border-right: 1px solid #d3d3d3;
 `;
 
 const Content = styled.div`
@@ -106,8 +119,9 @@ const Content = styled.div`
 `;
 
 const TransformListHeader = styled.div`
+  height: 50px;
   font-weight: bold;
-  padding: 8px 8px;
+  padding: 16px 8px;
 `;
 
 const TransformList = styled.div`
@@ -115,10 +129,11 @@ const TransformList = styled.div`
   padding: 0;
 `;
 
-const transformListItemHoverColor = `#181a1f`;
+const transformListItemHoverColor = `#d1d1d1`;
 const TransformListItem = styled.label`
   display: block;
   padding: 8px 8px;
+  cursor: pointer;
 
   &:hover {
     background-color: ${transformListItemHoverColor};
@@ -214,12 +229,20 @@ const App: React.FC<{}> = () => {
     <>
       <Header>
         <RelayLogo /> <Heading>Relay Compiler REPL</Heading>
+        <HeaderSide>
+          <div style={{ marginLeft: 16 }}>
+            Built with ❤️by{" "}
+            <a href="https://github.com/n1ru4l" style={{ fontWeight: "bold" }}>
+              @n1ru4l
+            </a>
+          </div>
+        </HeaderSide>
       </Header>
       <AppContainer>
         <Global styles={globalStyles} />
         <Sidebar>
           <TransformList>
-            <TransformListHeader>Active Transforms:</TransformListHeader>
+            <TransformListHeader>Active Transforms</TransformListHeader>
             {availableTransforms.map(transform => (
               <TransformListItem key={transform.title}>
                 <CheckboxInput
