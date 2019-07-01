@@ -90,11 +90,14 @@ const globalStyles = css`
   }
 `;
 
+const Container = styled.div``;
+
 const AppContainer = styled.div`
   display: flex;
   height: calc(100vh - ${headerHeight});
   width: 100vw;
   color: ${sideBarTextColor};
+  width: 100%;
 `;
 
 const Header = styled.div`
@@ -133,6 +136,7 @@ const Content = styled.div`
   overflow: hidden;
   display: flex;
   flex-direction: row;
+  overflow: auto;
 `;
 
 const TransformListHeader = styled.div`
@@ -162,15 +166,16 @@ const CheckboxInput = styled.input`
 `;
 
 const EditableContent = styled.div`
-  width: 100%;
-  flex: 1 0 0;
+  flex: 0 0 50%;
   display: flex;
   flex-direction: column;
   height: 100%;
+  width: 50%;
 `;
 
 const ResultContent = styled.div`
-  flex: 1 0 0;
+  flex: 0 0 50%;
+  width: 50%;
 `;
 
 const HeaderAuthor = styled.div`
@@ -205,6 +210,7 @@ const App: React.FC<{}> = () => {
   const [operationText, setOperationText] = useState(defaultOperation);
   const [optimizedOperationText, setOptimizedOperationText] = useState("");
   const [schema, setSchema] = useState<null | GraphQLSchema>(null);
+
   const [availableTransforms, setAvailableTransforms] = useState([
     {
       title: `RelayApplyFragmentArgumentTransform`,
@@ -232,35 +238,39 @@ const App: React.FC<{}> = () => {
   ]);
 
   useEffect(() => {
-    let schema: null | GraphQLSchema = null;
-    let optimizedQueryResult: null | string = null;
-    try {
-      schema = buildSchema(schemaText);
-      const relayDocuments = RelayParser.transform(
-        schema,
-        parse(operationText).definitions
-      );
+    const timeout = setTimeout(() => {
+      let schema: null | GraphQLSchema = null;
+      let optimizedQueryResult: null | string = null;
+      try {
+        schema = buildSchema(schemaText);
+        const relayDocuments = RelayParser.transform(
+          schema,
+          parse(operationText).definitions
+        );
 
-      const documents = new GraphQLCompilerContext(schema)
-        .addAll(relayDocuments)
-        .applyTransforms(
-          availableTransforms.filter(t => t.active).map(t => t.transform())
-        )
-        .documents();
+        const documents = new GraphQLCompilerContext(schema)
+          .addAll(relayDocuments)
+          .applyTransforms(
+            availableTransforms.filter(t => t.active).map(t => t.transform())
+          )
+          .documents();
 
-      optimizedQueryResult = documents
-        .map((doc: unknown) => GraphQLIRPrinter.print(doc))
-        .join(`\n`);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      if (optimizedQueryResult) {
-        setOptimizedOperationText(optimizedQueryResult);
+        optimizedQueryResult = documents
+          .map((doc: unknown) => GraphQLIRPrinter.print(doc))
+          .join(`\n`);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        if (optimizedQueryResult) {
+          setOptimizedOperationText(optimizedQueryResult);
+        }
+        if (schema) {
+          setSchema(schema);
+        }
       }
-      if (schema) {
-        setSchema(schema);
-      }
-    }
+    }, 300);
+
+    return () => clearTimeout(timeout);
   }, [
     schemaText,
     operationText,
@@ -270,7 +280,7 @@ const App: React.FC<{}> = () => {
   ]);
 
   return (
-    <>
+    <Container>
       <Header>
         <RelayLogo /> <Heading>Relay Compiler REPL</Heading>
         <HeaderSide>
@@ -331,7 +341,7 @@ const App: React.FC<{}> = () => {
           </ResultContent>
         </Content>
       </AppContainer>
-    </>
+    </Container>
   );
 };
 
