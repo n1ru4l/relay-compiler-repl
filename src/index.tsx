@@ -52,6 +52,21 @@ const RelayLogo: React.FC<{
   </svg>
 );
 
+const GithubIcon = () => (
+  <svg
+    width={16}
+    height={16}
+    viewBox={"0 0 24 24"}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+  </svg>
+);
+
 const globalStyles = css`
   * {
     box-sizing: border-box;
@@ -107,6 +122,8 @@ const HeaderSide = styled.div`
 const Sidebar = styled.div`
   flex: 0 0 auto;
   border-right: 1px solid #d3d3d3;
+  display: flex;
+  flex-direction: column;
 `;
 
 const Content = styled.div`
@@ -154,6 +171,33 @@ const EditableContent = styled.div`
 
 const ResultContent = styled.div`
   flex: 1 0 0;
+`;
+
+const HeaderAuthor = styled.div`
+  margin-left: 16px;
+  display: flex;
+  align-items: center;
+`;
+
+const HeaderAuthorLink = styled.a`
+  margin-left: 4px;
+  font-weight: bold;
+`;
+
+const ForkLinkContainer = styled.div`
+  margin-top: auto;
+  padding: 16px;
+`;
+
+const ForkLink = styled.a`
+  color: black;
+  fontweight: bold;
+  display: flex;
+  font-weight: bold;
+`;
+
+const ForkLinkText = styled.span`
+  margin-left: 8px;
 `;
 
 const App: React.FC<{}> = () => {
@@ -230,19 +274,19 @@ const App: React.FC<{}> = () => {
       <Header>
         <RelayLogo /> <Heading>Relay Compiler REPL</Heading>
         <HeaderSide>
-          <div style={{ marginLeft: 16 }}>
+          <HeaderAuthor>
             Built with ❤️by{" "}
-            <a href="https://github.com/n1ru4l" style={{ fontWeight: "bold" }}>
+            <HeaderAuthorLink href="https://github.com/n1ru4l">
               @n1ru4l
-            </a>
-          </div>
+            </HeaderAuthorLink>
+          </HeaderAuthor>
         </HeaderSide>
       </Header>
       <AppContainer>
         <Global styles={globalStyles} />
         <Sidebar>
           <TransformList>
-            <TransformListHeader>Active Transforms</TransformListHeader>
+            <TransformListHeader>Available Transforms</TransformListHeader>
             {availableTransforms.map(transform => (
               <TransformListItem key={transform.title}>
                 <CheckboxInput
@@ -267,6 +311,12 @@ const App: React.FC<{}> = () => {
               </TransformListItem>
             ))}
           </TransformList>
+          <ForkLinkContainer>
+            <ForkLink href="https://github.com/n1ru4l/relay-compiler-repl">
+              <GithubIcon />
+              <ForkLinkText>Fork me on Github</ForkLinkText>
+            </ForkLink>
+          </ForkLinkContainer>
         </Sidebar>
         <Content>
           <EditableContent>
