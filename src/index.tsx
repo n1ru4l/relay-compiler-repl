@@ -90,7 +90,9 @@ const globalStyles = css`
   }
 `;
 
-const Container = styled.div``;
+const Container = styled.div`
+  min-width: 1080px;
+`;
 
 const AppContainer = styled.div`
   display: flex;
