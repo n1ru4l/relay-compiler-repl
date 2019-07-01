@@ -1,6 +1,6 @@
 import "codemirror/lib/codemirror.css";
 import CodeMirror from "codemirror";
-import { buildSchema } from "graphql";
+import { buildSchema, GraphQLSchema } from "graphql";
 import stripIndent from "strip-indent";
 import MD from "markdown-it";
 import "codemirror/addon/hint/show-hint";
@@ -180,6 +180,12 @@ export const defaultOperation = stripIndent(/* GraphQL */ `
     id
     name
     appearsIn @include(if: $includeAppearsIn)
+    ... on Human {
+      homePlanet
+    }
+    ... on Droid {
+      primaryFunction
+    }
   }
 
   query UserProfile {
@@ -223,9 +229,12 @@ export const SchemaArea: React.FC<{
   const ref = useRef<HTMLTextAreaElement | null>(null);
   useEffect(() => {
     if (ref.current) {
-      CodeMirror.fromTextArea(ref.current, {
+      const editor = CodeMirror.fromTextArea(ref.current, {
         mode: "graphql",
         lineNumbers: true
+      });
+      editor.on("change", editor => {
+        onChangeSchema(editor.getValue());
       });
     }
   }, []);
@@ -237,80 +246,79 @@ export const SchemaArea: React.FC<{
   );
 };
 
-export const QueryArea: React.FC<{
+export const OperationArea: React.FC<{
   onChangeOperation: (str: string) => void;
-}> = ({ onChangeOperation }) => {
+  schema: GraphQLSchema | null;
+}> = ({ onChangeOperation, schema }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const ref = useRef<HTMLTextAreaElement | null>(null);
+  const editorRef = useRef<null | CodeMirror.EditorFromTextArea>(null);
 
   useEffect(() => {
     if (ref.current) {
-      const editor = CodeMirror.fromTextArea(ref.current, {
-        mode: "graphql",
-        lint: {
+      if (!editorRef.current) {
+        const showHint = () => {
+          if (!editorRef.current) {
+            return;
+          }
+          // @ts-ignore
+          editorRef.current.showHint({
+            completeSingle: true,
+            container: containerRef.current
+          });
+        };
+        editorRef.current = CodeMirror.fromTextArea(ref.current, {
+          mode: "graphql",
+          lint: {
+            schema
+          },
+          // @ts-ignore
+          hintOptions: {
+            schema,
+            closeOnUnfocus: false,
+            completeSingle: false
+          },
+          info: {
+            schema,
+            renderDescription: (text: string) => md.render(text)
+          },
+          lineNumbers: true,
+          tabSize: 2,
+          keyMap: "sublime",
+          autoCloseBrackets: true,
+          matchBrackets: true,
+          showCursorWhenSelecting: true,
+          foldGutter: {
+            minFoldSize: 4
+          },
+          extraKeys: {
+            "Cmd-Space": showHint,
+            "Ctrl-Space": showHint,
+            "Alt-Space": showHint,
+            "Shift-Space": showHint,
+            "Shift-Alt-Space": showHint
+          }
+        });
+        editorRef.current.on("change", editor => {
+          onChangeOperation(editor.getValue());
+        });
+      } else {
+        editorRef.current.setOption("lint", { schema });
+        editorRef.current.setOption("hintOptions", {
+          ...editorRef.current.getOption("hintOptions"),
           schema
-        },
-        // @ts-ignore
-        hintOptions: {
-          schema,
-          closeOnUnfocus: false,
-          completeSingle: false
-        },
-        info: {
-          schema,
-          renderDescription: (text: string) => md.render(text)
-        },
-        lineNumbers: true,
-        tabSize: 2,
-        keyMap: "sublime",
-        autoCloseBrackets: true,
-        matchBrackets: true,
-        showCursorWhenSelecting: true,
-        foldGutter: {
-          minFoldSize: 4
-        },
-        extraKeys: {
-          "Cmd-Space": () =>
-            // @ts-ignore
-            editor.showHint({
-              completeSingle: true,
-              container: containerRef.current
-            }),
-          "Ctrl-Space": () =>
-            // @ts-ignore
-            editor.showHint({
-              completeSingle: true,
-              container: containerRef.current
-            }),
-          "Alt-Space": () =>
-            // @ts-ignore
-            editor.showHint({
-              completeSingle: true,
-              container: containerRef.current
-            }),
-          "Shift-Space": () =>
-            // @ts-ignore
-            editor.showHint({
-              completeSingle: true,
-              container: containerRef.current
-            }),
-          "Shift-Alt-Space": () =>
-            // @ts-ignore
-            editor.showHint({
-              completeSingle: true,
-              container: containerRef.current
-            })
-        }
-      });
-      editor.on("change", editor => {
-        onChangeOperation(editor.getValue());
-      });
+        });
+        editorRef.current.setOption("info", {
+          ...editorRef.current.getOption("info"),
+          schema
+        });
+      }
     }
-  }, []);
+  }, [schema]);
   return (
     <Container ref={containerRef}>
       <TextareaHeader>Operation</TextareaHeader>
-      <Textarea ref={ref} defaultValue={defaultOperation} />
+      <Textarea ref={ref} defaultValue={defaultOperation.replace(`\n`, "")} />
     </Container>
   );
 };

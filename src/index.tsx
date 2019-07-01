@@ -6,7 +6,7 @@ import styled from "@emotion/styled/macro";
 import css from "@emotion/css/macro";
 import {
   SchemaArea,
-  QueryArea,
+  OperationArea,
   ResultArea,
   rawSchema,
   defaultOperation
@@ -26,10 +26,9 @@ import FlattenTransform from "relay-compiler/lib/FlattenTransform";
 import RelayParser from "relay-compiler/lib/RelayParser";
 // @ts-ignore
 import GraphQLIRPrinter from "relay-compiler/lib/GraphQLIRPrinter";
-import { buildSchema, parse } from "graphql";
+import { buildSchema, parse, GraphQLSchema } from "graphql";
 
 const root = document.getElementById("root");
-const foo = "";
 if (!root) {
   throw new Error("Could not find Application root container.");
 }
@@ -146,6 +145,7 @@ const App: React.FC<{}> = () => {
   const [schemaText, setSchemaText] = useState(rawSchema);
   const [operationText, setOperationText] = useState(defaultOperation);
   const [optimizedOperationText, setOptimizedOperationText] = useState("");
+  const [schema, setSchema] = useState<null | GraphQLSchema>(null);
   const [availableTransforms, setAvailableTransforms] = useState([
     {
       title: `RelayApplyFragmentArgumentTransform`,
@@ -173,8 +173,10 @@ const App: React.FC<{}> = () => {
   ]);
 
   useEffect(() => {
+    let schema: null | GraphQLSchema = null;
+    let optimizedQueryResult: null | string = null;
     try {
-      const schema = buildSchema(schemaText);
+      schema = buildSchema(schemaText);
       const relayDocuments = RelayParser.transform(
         schema,
         parse(operationText).definitions
@@ -186,17 +188,26 @@ const App: React.FC<{}> = () => {
           availableTransforms.filter(t => t.active).map(t => t.transform())
         )
         .documents();
-      setOptimizedOperationText(
-        documents.map((doc: unknown) => GraphQLIRPrinter.print(doc)).join(`\n`)
-      );
+
+      optimizedQueryResult = documents
+        .map((doc: unknown) => GraphQLIRPrinter.print(doc))
+        .join(`\n`);
     } catch (err) {
       console.error(err);
+    } finally {
+      if (optimizedQueryResult) {
+        setOptimizedOperationText(optimizedQueryResult);
+      }
+      if (schema) {
+        setSchema(schema);
+      }
     }
   }, [
     schemaText,
     operationText,
     availableTransforms,
-    setOptimizedOperationText
+    setOptimizedOperationText,
+    setSchema
   ]);
 
   return (
@@ -206,7 +217,6 @@ const App: React.FC<{}> = () => {
       </Header>
       <AppContainer>
         <Global styles={globalStyles} />
-
         <Sidebar>
           <TransformList>
             <TransformListHeader>Active Transforms:</TransformListHeader>
@@ -237,15 +247,10 @@ const App: React.FC<{}> = () => {
         </Sidebar>
         <Content>
           <EditableContent>
-            <SchemaArea
-              onChangeSchema={schemaText => {
-                setSchemaText(schemaText);
-              }}
-            />
-            <QueryArea
-              onChangeOperation={operationText => {
-                setOperationText(operationText);
-              }}
+            <SchemaArea onChangeSchema={setSchemaText} />
+            <OperationArea
+              onChangeOperation={setOperationText}
+              schema={schema}
             />
           </EditableContent>
           <ResultContent>
