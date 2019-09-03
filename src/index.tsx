@@ -12,21 +12,13 @@ import {
   defaultOperation
 } from "./codemirror";
 
-// @ts-ignore
 import { GraphQLCompilerContext } from "relay-compiler";
-// @ts-ignore
 import InlineFragmentsTransform from "relay-compiler/lib/InlineFragmentsTransform";
-// @ts-ignore
 import SkipRedundantNodesTransform from "relay-compiler/lib/SkipRedundantNodesTransform";
-// @ts-ignore
 import RelayApplyFragmentArgumentTransform from "relay-compiler/lib/RelayApplyFragmentArgumentTransform";
-// @ts-ignore
 import FlattenTransform from "relay-compiler/lib/FlattenTransform";
-// @ts-ignore
 import RelayParser from "relay-compiler/lib/RelayParser";
-// @ts-ignore
 import GraphQLIRPrinter from "relay-compiler/lib/GraphQLIRPrinter";
-// @ts-ignore
 import { transformASTSchema } from "relay-compiler/lib/ASTConvert";
 
 import {
@@ -35,8 +27,10 @@ import {
   GraphQLSchema,
   GraphQLType,
   isNonNullType,
-  isListType
+  isListType,
+  DefinitionNode
 } from "graphql";
+import { LocalArgumentDefinition } from "relay-compiler/lib/GraphQLIR";
 
 const root = document.getElementById("root");
 if (!root) {
@@ -236,7 +230,7 @@ const printDefaultValue = (defaultValue: any) => {
 };
 
 const buildDirectiveDefinition = (
-  input: { defaultValue: any; name: string; type: GraphQLType }[]
+  input: readonly LocalArgumentDefinition[]
 ) => {
   return `directive @arguments(
 ${input
@@ -288,13 +282,16 @@ const App: React.FC<{}> = () => {
       let optimizedQueryResult: null | string = null;
       try {
         schema = buildSchema(schemaText);
-        const relayDocuments: unknown[] = RelayParser.transform(
-          schema,
-          parse(operationText).definitions
-        );
+        const relayDocuments = RelayParser.transform(schema, parse(
+          operationText
+        ).definitions as Array<DefinitionNode>);
+
         const argumentDefinitions = relayDocuments.reduce(
-          (result: unknown[], doc: any) => {
-            return [...result, ...(doc.argumentDefinitions || [])];
+          (result: Readonly<LocalArgumentDefinition[]>, doc) => {
+            return [
+              ...result,
+              ...((doc.argumentDefinitions || []) as LocalArgumentDefinition[])
+            ];
           },
           []
         );
@@ -311,7 +308,7 @@ const App: React.FC<{}> = () => {
           .documents();
 
         optimizedQueryResult = documents
-          .map((doc: unknown) => GraphQLIRPrinter.print(doc))
+          .map(doc => GraphQLIRPrinter.print(doc))
           .join(`\n`);
 
         schema = transformASTSchema(schema, [argumentDirectiveDefinition]);
