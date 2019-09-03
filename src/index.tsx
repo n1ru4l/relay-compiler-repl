@@ -266,7 +266,7 @@ const App: React.FC<{}> = () => {
       title: `FlattenTransform`,
       active: true,
       transform: () =>
-        FlattenTransform.transformWithOptions({ flattenAbstractTypes: true })
+        FlattenTransform.transformWithOptions({ flattenAbstractTypes: false })
     },
 
     {
@@ -282,6 +282,7 @@ const App: React.FC<{}> = () => {
       let optimizedQueryResult: null | string = null;
       try {
         schema = buildSchema(schemaText);
+        console.log("we got here");
         const relayDocuments = RelayParser.transform(schema, parse(
           operationText
         ).definitions as Array<DefinitionNode>);
@@ -322,7 +323,7 @@ const App: React.FC<{}> = () => {
           setSchema(schema);
         }
       }
-    }, 300);
+    }, 200);
 
     return () => clearTimeout(timeout);
   }, [
