@@ -227,6 +227,9 @@ export const SchemaArea: React.FC<{
   onChangeSchema: (str: string) => void;
 }> = ({ onChangeSchema }) => {
   const ref = useRef<HTMLTextAreaElement | null>(null);
+  const onSchemaChangeRef = useRef(onChangeSchema);
+  onSchemaChangeRef.current = onChangeSchema;
+
   useEffect(() => {
     if (ref.current) {
       const editor = CodeMirror.fromTextArea(ref.current, {
@@ -234,10 +237,11 @@ export const SchemaArea: React.FC<{
         lineNumbers: true
       });
       editor.on("change", editor => {
-        onChangeSchema(editor.getValue());
+        onSchemaChangeRef.current(editor.getValue());
       });
     }
   }, []);
+
   return (
     <Container>
       <TextareaHeader>Schema</TextareaHeader>
@@ -253,6 +257,8 @@ export const OperationArea: React.FC<{
   const containerRef = useRef<HTMLDivElement | null>(null);
   const ref = useRef<HTMLTextAreaElement | null>(null);
   const editorRef = useRef<null | CodeMirror.EditorFromTextArea>(null);
+  const onChangeOperationRef = useRef(onChangeOperation);
+  onChangeOperationRef.current = onChangeOperation;
 
   useEffect(() => {
     if (ref.current) {
@@ -300,7 +306,7 @@ export const OperationArea: React.FC<{
           }
         });
         editorRef.current.on("change", editor => {
-          onChangeOperation(editor.getValue());
+          onChangeOperationRef.current(editor.getValue());
         });
       } else {
         editorRef.current.setOption("lint", { schema });

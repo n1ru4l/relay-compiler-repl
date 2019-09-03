@@ -202,7 +202,6 @@ const ForkLinkContainer = styled.div`
 
 const ForkLink = styled.a`
   color: black;
-  fontweight: bold;
   display: flex;
   font-weight: bold;
 `;
@@ -244,37 +243,41 @@ ${input
 ) on FRAGMENT_SPREAD`;
 };
 
+const createInitialAvailableTransformsState = () => [
+  {
+    title: `RelayApplyFragmentArgumentTransform`,
+    active: true,
+    transform: () => RelayApplyFragmentArgumentTransform.transform
+  },
+
+  {
+    title: `InlineFragmentsTransform`,
+    active: true,
+    transform: () => InlineFragmentsTransform.transform
+  },
+  {
+    title: `FlattenTransform`,
+    active: true,
+    transform: () =>
+      FlattenTransform.transformWithOptions({ flattenAbstractTypes: false })
+  },
+
+  {
+    title: `SkipRedundantNodesTransform`,
+    active: true,
+    transform: () => SkipRedundantNodesTransform.transform
+  }
+];
+
 const App: React.FC<{}> = () => {
   const [schemaText, setSchemaText] = useState(rawSchema);
   const [operationText, setOperationText] = useState(defaultOperation);
   const [optimizedOperationText, setOptimizedOperationText] = useState("");
   const [schema, setSchema] = useState<null | GraphQLSchema>(null);
 
-  const [availableTransforms, setAvailableTransforms] = useState([
-    {
-      title: `RelayApplyFragmentArgumentTransform`,
-      active: true,
-      transform: () => RelayApplyFragmentArgumentTransform.transform
-    },
-
-    {
-      title: `InlineFragmentsTransform`,
-      active: true,
-      transform: () => InlineFragmentsTransform.transform
-    },
-    {
-      title: `FlattenTransform`,
-      active: true,
-      transform: () =>
-        FlattenTransform.transformWithOptions({ flattenAbstractTypes: false })
-    },
-
-    {
-      title: `SkipRedundantNodesTransform`,
-      active: true,
-      transform: () => SkipRedundantNodesTransform.transform
-    }
-  ]);
+  const [availableTransforms, setAvailableTransforms] = useState(
+    createInitialAvailableTransformsState
+  );
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -340,7 +343,11 @@ const App: React.FC<{}> = () => {
         <RelayLogo /> <Heading>Relay Compiler REPL</Heading>
         <HeaderSide>
           <HeaderAuthor>
-            Built with ❤️by{" "}
+            Built with{" "}
+            <span role="img" aria-label="love" style={{ paddingLeft: 5 }}>
+              ❤️
+            </span>
+            by{" "}
             <HeaderAuthorLink href="https://github.com/n1ru4l">
               @n1ru4l
             </HeaderAuthorLink>
