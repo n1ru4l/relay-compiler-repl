@@ -12,14 +12,12 @@ import {
   defaultOperation
 } from "./codemirror";
 
-import { GraphQLCompilerContext } from "relay-compiler";
-import InlineFragmentsTransform from "relay-compiler/lib/InlineFragmentsTransform";
-import SkipRedundantNodesTransform from "relay-compiler/lib/SkipRedundantNodesTransform";
-import RelayApplyFragmentArgumentTransform from "relay-compiler/lib/RelayApplyFragmentArgumentTransform";
-import FlattenTransform from "relay-compiler/lib/FlattenTransform";
-import RelayParser from "relay-compiler/lib/RelayParser";
-import GraphQLIRPrinter from "relay-compiler/lib/GraphQLIRPrinter";
-import { transformASTSchema } from "relay-compiler/lib/ASTConvert";
+import InlineFragmentsTransform from "relay-compiler/lib/transforms/InlineFragmentsTransform";
+import SkipRedundantNodesTransform from "relay-compiler/lib/transforms/SkipRedundantNodesTransform";
+import RelayApplyFragmentArgumentTransform from "relay-compiler/lib/transforms/RelayApplyFragmentArgumentTransform";
+import FlattenTransform from "relay-compiler/lib/transforms/FlattenTransform";
+import { Parser as RelayParser, Printer as GraphQLIRPrinter, GraphQLCompilerContext } from "relay-compiler";
+import { transformASTSchema } from "relay-compiler/lib/core/ASTConvert";
 
 import {
   buildSchema,
@@ -30,7 +28,7 @@ import {
   isListType,
   DefinitionNode
 } from "graphql";
-import { LocalArgumentDefinition } from "relay-compiler/lib/GraphQLIR";
+import { LocalArgumentDefinition } from "relay-compiler/lib/core/GraphQLIR";
 
 const root = document.getElementById("root");
 if (!root) {
