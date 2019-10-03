@@ -4,8 +4,8 @@
   "private": true,
   "dependencies": {
     "graphql": "14.5.4",
-    "react": "16.10.1",
-    "react-dom": "16.10.1",
+    "react": "16.10.2",
+    "react-dom": "16.10.2",
     "react-scripts": "3.1.1",
     "relay-compiler": "6.0.0",
     "strip-indent": "3.0.0"
