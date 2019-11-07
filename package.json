@@ -7,7 +7,7 @@
     "react": "16.11.0",
     "react-dom": "16.11.0",
     "react-scripts": "3.2.0",
-    "relay-compiler": "6.0.0",
+    "relay-compiler": "7.1.0",
     "strip-indent": "3.0.0"
   },
   "scripts": {
@@ -39,7 +39,7 @@
     "@types/markdown-it": "0.0.9",
     "@types/react": "16.9.9",
     "@types/react-dom": "16.9.2",
-    "@types/relay-compiler": "6.0.1",
+    "@types/relay-compiler": "7.0.2",
     "codemirror": "5.49.0",
     "codemirror-graphql": "0.8.3",
     "eslint": "6.5.1",
