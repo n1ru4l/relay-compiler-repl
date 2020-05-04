@@ -7,7 +7,7 @@
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-scripts": "3.2.0",
-    "relay-compiler": "6.0.0",
+    "relay-compiler": "9.1.0",
     "strip-indent": "3.0.0"
   },
   "scripts": {
