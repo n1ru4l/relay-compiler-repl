@@ -135,6 +135,7 @@ export const rawSchema = stripIndent(/* GraphQL */ `
     startCursor: ID
     endCursor: ID
     hasNextPage: Boolean!
+    hasPreviousPage: Boolean!
   }
   # Represents a review for a movie
   type Review {

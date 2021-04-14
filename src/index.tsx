@@ -16,14 +16,16 @@ import InlineFragmentsTransform from "relay-compiler/lib/transforms/InlineFragme
 import SkipRedundantNodesTransform from "relay-compiler/lib/transforms/SkipRedundantNodesTransform";
 import ApplyFragmentArgumentTransform from "relay-compiler/lib/transforms/ApplyFragmentArgumentTransform";
 import FlattenTransform from "relay-compiler/lib/transforms/FlattenTransform";
+import { commonTransforms, queryTransforms, printTransforms, schemaExtensions } from "relay-compiler/lib/core/RelayIRTransforms";
 import {
   Parser as RelayParser,
   Printer as GraphQLIRPrinter,
   LocalArgumentDefinition,
-  CompilerContext
+  CompilerContext,
+  transformASTSchema
 } from "relay-compiler";
-import { transformASTSchema } from "relay-compiler/lib/core/ASTConvert";
 import { create as createSchema } from "relay-compiler/lib/core/Schema";
+import ASTConvert from "relay-compiler/lib/core/ASTConvert";
 
 import {
   buildSchema,
@@ -31,8 +33,7 @@ import {
   GraphQLSchema,
   GraphQLType,
   isNonNullType,
-  isListType,
-  DefinitionNode
+  isListType
 } from "graphql";
 
 const root = document.getElementById("root");
@@ -213,39 +214,6 @@ const ForkLinkText = styled.span`
   margin-left: 8px;
 `;
 
-const printGraphQLType = (type: GraphQLType): string => {
-  if (isNonNullType(type)) {
-    return `${printGraphQLType(type)}!`;
-  } else if (isListType(type)) {
-    return `[${printGraphQLType(type)}]`;
-  }
-  return `${type.name}`;
-};
-
-const printDefaultValue = (defaultValue: any) => {
-  if (defaultValue === undefined) {
-    return ``;
-  } else if (typeof defaultValue === "string") {
-    return ` = "${defaultValue}"`;
-  }
-  return " = " + String(defaultValue);
-};
-
-const buildDirectiveDefinition = (
-  input: readonly LocalArgumentDefinition[]
-) => {
-  return `directive @arguments(
-${input
-      .map(
-        input =>
-          `  ${input.name}: ${printGraphQLType(input.type)}${printDefaultValue(
-            input.defaultValue
-          )}`
-      )
-      .join(",\n")}
-) on FRAGMENT_SPREAD`;
-};
-
 const createInitialAvailableTransformsState = () => [
   {
     title: `ApplyFragmentArgumentTransform`,
@@ -286,15 +254,17 @@ const App: React.FC<{}> = () => {
       let optimizedQueryResult: null | string = null;
       try {
         schema = buildSchema(schemaText);
-        const relaySchema = createSchema(schemaText);
+        const relaySchema = createSchema(schemaText, [], schemaExtensions);
 
         if ((schema == null) || (relaySchema == null)) {
           throw new Error('Missing schema!');
         }
 
-        const relayDocuments = RelayParser.transform(
+        const inputDocuments = [parse(operationText)];
+        const relayDocuments = ASTConvert.convertASTDocuments(
           relaySchema,
-          parse(operationText).definitions as Array<DefinitionNode>
+          inputDocuments,
+          RelayParser.transform,
         );
 
         const argumentDefinitions = relayDocuments.reduce(
@@ -307,22 +277,26 @@ const App: React.FC<{}> = () => {
           []
         );
 
-        const argumentDirectiveDefinition = buildDirectiveDefinition(
-          argumentDefinitions
-        );
-
-        const documents = new CompilerContext(relaySchema)
-          .addAll(relayDocuments)
+        const compilerContext = new CompilerContext(relaySchema).addAll(relayDocuments)
+        const transformedContext = compilerContext.applyTransforms([
+          ...commonTransforms,
+          ...queryTransforms,
+          ...printTransforms
+        ])
+        const outputDocuments = transformedContext
           .applyTransforms(
-            availableTransforms.filter(t => t.active).map(t => t.transform())
+            [
+              ...commonTransforms,
+              ...availableTransforms.filter(t => t.active).map(t => t.transform())
+            ]
           )
           .documents();
 
-        optimizedQueryResult = documents
+        optimizedQueryResult = outputDocuments
           .map(doc => GraphQLIRPrinter.print(relaySchema, doc))
           .join(`\n`);
 
-        schema = transformASTSchema(schema, [argumentDirectiveDefinition]);
+        schema = transformASTSchema(schema, schemaExtensions);
       } catch (err) {
         console.error(err);
       } finally {
