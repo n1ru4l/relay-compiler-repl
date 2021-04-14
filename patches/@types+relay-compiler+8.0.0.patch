@@ -1,0 +1,34 @@
+diff --git a/node_modules/@types/relay-compiler/lib/core/IRPrinter.d.ts b/node_modules/@types/relay-compiler/lib/core/IRPrinter.d.ts
+index d8758a4..1aa8beb 100644
+--- a/node_modules/@types/relay-compiler/lib/core/IRPrinter.d.ts
++++ b/node_modules/@types/relay-compiler/lib/core/IRPrinter.d.ts
+@@ -1,2 +1,3 @@
+ import { CompilerContextDocument } from './CompilerContext';
+-export function print(node: CompilerContextDocument): string;
++import { Schema } from './Schema'
++export function print(schema: Schema, node: CompilerContextDocument): string;
+diff --git a/node_modules/@types/relay-compiler/lib/core/Schema.d.ts b/node_modules/@types/relay-compiler/lib/core/Schema.d.ts
+index c79aea0..4cf317f 100644
+--- a/node_modules/@types/relay-compiler/lib/core/Schema.d.ts
++++ b/node_modules/@types/relay-compiler/lib/core/Schema.d.ts
+@@ -74,7 +74,7 @@ export interface Schema {
+     getEnumValues: (type: EnumTypeID) => string[];
+     getFieldByName: (type: CompositeTypeID | InputObjectTypeID, fieldName: string) => FieldID | null | undefined;
+     getFieldArgs: (field: FieldID) => ReadonlyArray<Argument>;
+-    getFieldArgByName: (field: FieldID, argName: string) => Argument | null  | undefined;
++    getFieldArgByName: (field: FieldID, argName: string) => Argument | null | undefined;
+     getFieldConfig: (field: FieldID) => { type: TypeID, args: ReadonlyArray<Argument> };
+     getFieldName: (field: FieldID) => string;
+     getFieldParentType: (field: FieldID) => TypeID;
+@@ -127,3 +127,11 @@ export interface Schema {
+     parseValue: (type: ScalarTypeID | EnumTypeID, value: any) => any;
+     serialize: (type: ScalarTypeID | EnumTypeID, value: any) => any;
+ }
++
++declare function create(
++    baseSchema: Source,
++    schemaExtensionDocuments?: ReadonlyArray<DocumentNode>,
++    schemaExtensions?: ReadonlyArray<string>,
++): Schema;
++
++export { create };

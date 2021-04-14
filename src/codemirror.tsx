@@ -1,6 +1,6 @@
 import "codemirror/lib/codemirror.css";
 import CodeMirror from "codemirror";
-import { buildSchema, GraphQLSchema } from "graphql";
+import { GraphQLSchema } from "graphql";
 import stripIndent from "strip-indent";
 import MD from "markdown-it";
 import "codemirror/addon/hint/show-hint";
@@ -199,8 +199,6 @@ export const defaultOperation = stripIndent(/* GraphQL */ `
     }
   }
 `);
-
-const schema = buildSchema(rawSchema);
 
 const Textarea = styled.textarea`
   width: 100%;

@@ -14,10 +14,16 @@ import {
 
 import InlineFragmentsTransform from "relay-compiler/lib/transforms/InlineFragmentsTransform";
 import SkipRedundantNodesTransform from "relay-compiler/lib/transforms/SkipRedundantNodesTransform";
-import RelayApplyFragmentArgumentTransform from "relay-compiler/lib/transforms/RelayApplyFragmentArgumentTransform";
+import ApplyFragmentArgumentTransform from "relay-compiler/lib/transforms/ApplyFragmentArgumentTransform";
 import FlattenTransform from "relay-compiler/lib/transforms/FlattenTransform";
-import { Parser as RelayParser, Printer as GraphQLIRPrinter, GraphQLCompilerContext } from "relay-compiler";
+import {
+  Parser as RelayParser,
+  Printer as GraphQLIRPrinter,
+  LocalArgumentDefinition,
+  CompilerContext
+} from "relay-compiler";
 import { transformASTSchema } from "relay-compiler/lib/core/ASTConvert";
+import { create as createSchema } from "relay-compiler/lib/core/Schema";
 
 import {
   buildSchema,
@@ -28,7 +34,6 @@ import {
   isListType,
   DefinitionNode
 } from "graphql";
-import { LocalArgumentDefinition } from "relay-compiler/lib/core/GraphQLIR";
 
 const root = document.getElementById("root");
 if (!root) {
@@ -231,23 +236,22 @@ const buildDirectiveDefinition = (
 ) => {
   return `directive @arguments(
 ${input
-  .map(
-    input =>
-      `  ${input.name}: ${printGraphQLType(input.type)}${printDefaultValue(
-        input.defaultValue
-      )}`
-  )
-  .join(",\n")}
+      .map(
+        input =>
+          `  ${input.name}: ${printGraphQLType(input.type)}${printDefaultValue(
+            input.defaultValue
+          )}`
+      )
+      .join(",\n")}
 ) on FRAGMENT_SPREAD`;
 };
 
 const createInitialAvailableTransformsState = () => [
   {
-    title: `RelayApplyFragmentArgumentTransform`,
+    title: `ApplyFragmentArgumentTransform`,
     active: true,
-    transform: () => RelayApplyFragmentArgumentTransform.transform
+    transform: () => ApplyFragmentArgumentTransform.transform
   },
-
   {
     title: `InlineFragmentsTransform`,
     active: true,
@@ -259,7 +263,6 @@ const createInitialAvailableTransformsState = () => [
     transform: () =>
       FlattenTransform.transformWithOptions({ flattenAbstractTypes: false })
   },
-
   {
     title: `SkipRedundantNodesTransform`,
     active: true,
@@ -283,10 +286,16 @@ const App: React.FC<{}> = () => {
       let optimizedQueryResult: null | string = null;
       try {
         schema = buildSchema(schemaText);
-        console.log("we got here");
-        const relayDocuments = RelayParser.transform(schema, parse(
-          operationText
-        ).definitions as Array<DefinitionNode>);
+        const relaySchema = createSchema(schemaText);
+
+        if ((schema == null) || (relaySchema == null)) {
+          throw new Error('Missing schema!');
+        }
+
+        const relayDocuments = RelayParser.transform(
+          relaySchema,
+          parse(operationText).definitions as Array<DefinitionNode>
+        );
 
         const argumentDefinitions = relayDocuments.reduce(
           (result: Readonly<LocalArgumentDefinition[]>, doc) => {
@@ -302,7 +311,7 @@ const App: React.FC<{}> = () => {
           argumentDefinitions
         );
 
-        const documents = new GraphQLCompilerContext(schema)
+        const documents = new CompilerContext(relaySchema)
           .addAll(relayDocuments)
           .applyTransforms(
             availableTransforms.filter(t => t.active).map(t => t.transform())
@@ -310,7 +319,7 @@ const App: React.FC<{}> = () => {
           .documents();
 
         optimizedQueryResult = documents
-          .map(doc => GraphQLIRPrinter.print(doc))
+          .map(doc => GraphQLIRPrinter.print(relaySchema, doc))
           .join(`\n`);
 
         schema = transformASTSchema(schema, [argumentDirectiveDefinition]);

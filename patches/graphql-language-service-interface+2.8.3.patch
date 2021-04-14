@@ -1,0 +1,40 @@
+diff --git a/node_modules/graphql-language-service-interface/esm/getAutocompleteSuggestions.js b/node_modules/graphql-language-service-interface/esm/getAutocompleteSuggestions.js
+index 6946759..3af220f 100644
+--- a/node_modules/graphql-language-service-interface/esm/getAutocompleteSuggestions.js
++++ b/node_modules/graphql-language-service-interface/esm/getAutocompleteSuggestions.js
+@@ -51,7 +51,7 @@ export function getAutocompleteSuggestions(schema, queryText, cursor, contextTok
+             return hintList(token, argDefs.map(argDef => ({
+                 label: argDef.name,
+                 detail: String(argDef.type),
+-                documentation: argDef.description ?? undefined,
++                documentation: argDef.description,
+                 kind: CompletionItemKind.Variable,
+                 type: argDef.type,
+             })));
+@@ -67,7 +67,7 @@ export function getAutocompleteSuggestions(schema, queryText, cursor, contextTok
+             return hintList(token, objectFields.map(field => ({
+                 label: field.name,
+                 detail: String(field.type),
+-                documentation: field.description ?? undefined,
++                documentation: field.description,
+                 kind: completionKind,
+                 type: field.type,
+             })));
+@@ -126,7 +126,7 @@ function getSuggestionsForFieldNames(token, typeInfo, schema) {
+             sortText: String(index) + field.name,
+             label: field.name,
+             detail: String(field.type),
+-            documentation: field.description ?? undefined,
++            documentation: field.description,
+             deprecated: field.isDeprecated,
+             isDeprecated: field.isDeprecated,
+             deprecationReason: field.deprecationReason,
+@@ -145,7 +145,7 @@ function getSuggestionsForInputValues(token, typeInfo, queryText, schema) {
+             .map((value) => ({
+             label: value.name,
+             detail: String(namedInputType),
+-            documentation: value.description ?? undefined,
++            documentation: value.description,
+             deprecated: value.isDeprecated,
+             isDeprecated: value.isDeprecated,
+             deprecationReason: value.deprecationReason,
