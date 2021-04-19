@@ -16,7 +16,7 @@ import InlineFragmentsTransform from "relay-compiler/lib/transforms/InlineFragme
 import SkipRedundantNodesTransform from "relay-compiler/lib/transforms/SkipRedundantNodesTransform";
 import ApplyFragmentArgumentTransform from "relay-compiler/lib/transforms/ApplyFragmentArgumentTransform";
 import FlattenTransform from "relay-compiler/lib/transforms/FlattenTransform";
-import { commonTransforms, queryTransforms, printTransforms, schemaExtensions } from "relay-compiler/lib/core/RelayIRTransforms";
+import { commonTransforms, queryTransforms, printTransforms, schemaExtensions, codegenTransforms } from "relay-compiler/lib/core/RelayIRTransforms";
 import {
   Parser as RelayParser,
   Printer as GraphQLIRPrinter,
@@ -228,8 +228,7 @@ const createInitialAvailableTransformsState = () => [
   {
     title: `FlattenTransform`,
     active: true,
-    transform: () =>
-      FlattenTransform.transformWithOptions({ flattenAbstractTypes: false })
+    transform: () => FlattenTransform.transformWithOptions({})
   },
   {
     title: `SkipRedundantNodesTransform`,
@@ -278,15 +277,12 @@ const App: React.FC<{}> = () => {
         );
 
         const compilerContext = new CompilerContext(relaySchema).addAll(relayDocuments)
-        const transformedContext = compilerContext.applyTransforms([
-          ...commonTransforms,
-          ...queryTransforms,
-          ...printTransforms
-        ])
-        const outputDocuments = transformedContext
+        const outputDocuments = compilerContext
           .applyTransforms(
             [
               ...commonTransforms,
+              ...queryTransforms,
+              ...printTransforms,
               ...availableTransforms.filter(t => t.active).map(t => t.transform())
             ]
           )
