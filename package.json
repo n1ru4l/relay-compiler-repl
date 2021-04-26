@@ -34,7 +34,7 @@
   "devDependencies": {
     "@emotion/core": "10.0.35",
     "@emotion/styled": "10.0.27",
-    "@types/codemirror": "0.0.75",
+    "@types/codemirror": "0.0.109",
     "@types/graphql": "14.2.2",
     "@types/markdown-it": "0.0.9",
     "@types/react": "16.9.53",
