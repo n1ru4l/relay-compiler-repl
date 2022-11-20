@@ -1799,12 +1799,13 @@
     "@types/prop-types" "*"
     csstype "^2.2.0"
 
-"@types/react@16.9.53":
-  version "16.9.53"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-16.9.53.tgz#40cd4f8b8d6b9528aedd1fff8fcffe7a112a3d23"
-  integrity sha512-4nW60Sd4L7+WMXH1D6jCdVftuW7j4Za6zdp6tJ33Rqv0nk1ZAmQKML9ZLD4H0dehA3FZxXR/GM8gXplf82oNGw==
+"@types/react@16.14.34":
+  version "16.14.34"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-16.14.34.tgz#d129324ffda312044e1c47aab18696e4ed493282"
+  integrity sha512-b99nWeGGReLh6aKBppghVqp93dFJtgtDOzc8NXM6hewD8PQ2zZG5kBLgbx+VJr7Q7WBMjHxaIl3dwpwwPIUgyA==
   dependencies:
     "@types/prop-types" "*"
+    "@types/scheduler" "*"
     csstype "^3.0.2"
 
 "@types/relay-compiler@6.0.1":
@@ -1819,6 +1820,11 @@
   version "6.0.6"
   resolved "https://registry.yarnpkg.com/@types/relay-runtime/-/relay-runtime-6.0.6.tgz#ca1a2ba8eaff8fcefc584afac0df68490d5b88e8"
   integrity sha512-S2C2/BeXw22XKaz9F0rEn7bsyIhTZrtc+mFaTeK+5mGj7Sa6AD+8Vs9hOhPSe3aTbeDu2ORINz8mlrB/dehKKQ==
+
+"@types/scheduler@*":
+  version "0.16.2"
+  resolved "https://registry.yarnpkg.com/@types/scheduler/-/scheduler-0.16.2.tgz#1a62f89525723dde24ba1b01b092bf5df8ad4d39"
+  integrity sha512-hppQEBDmlwhFAXKJX2KnWLYu5yMfi91yazPb2l+lbJiwW+wdo1gNeRA+3RgNSO39WYX2euey41KEwnqesU2Jew==
 
 "@types/stack-utils@^1.0.1":
   version "1.0.1"
