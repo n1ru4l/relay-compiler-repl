@@ -210,9 +210,9 @@ const ForkLinkText = styled.span`
 
 const printGraphQLType = (type: GraphQLType): string => {
   if (isNonNullType(type)) {
-    return `${printGraphQLType(type)}!`;
+    return `${printGraphQLType(type.ofType)}!`;
   } else if (isListType(type)) {
-    return `[${printGraphQLType(type)}]`;
+    return `[${printGraphQLType(type.ofType)}]`;
   }
   return `${type.name}`;
 };
