@@ -1705,10 +1705,10 @@
   dependencies:
     "@babel/types" "^7.3.0"
 
-"@types/codemirror@0.0.75":
-  version "0.0.75"
-  resolved "https://registry.yarnpkg.com/@types/codemirror/-/codemirror-0.0.75.tgz#95010c3fd4e3e61665635048a25d7f9d4f8a0d6e"
-  integrity sha512-GhTfPMqrQiHdBoM002Lc6pcyBewsbginhYDhmmXUMxc980VTWm9UsmcnVdb5VmA2NWw492J3nMy9vG2s/IQQfA==
+"@types/codemirror@5.60.15":
+  version "5.60.15"
+  resolved "https://registry.yarnpkg.com/@types/codemirror/-/codemirror-5.60.15.tgz#0f82be6f4126d1e59cf4c4830e56dcd49d3c3e8a"
+  integrity sha512-dTOvwEQ+ouKJ/rE9LT1Ue2hmP6H1mZv5+CCnNWu2qtiOe2LQa9lCprEY20HxiDmV/Bxh+dXjywmy5aKvoGjULA==
   dependencies:
     "@types/tern" "*"
 
