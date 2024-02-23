@@ -42,7 +42,7 @@
     "@types/relay-compiler": "6.0.1",
     "codemirror": "5.49.0",
     "codemirror-graphql": "0.8.3",
-    "eslint": "6.5.1",
+    "eslint": "8.57.0",
     "husky": "4.3.0",
     "lint-staged": "8.2.1",
     "markdown-it": "8.4.2",
